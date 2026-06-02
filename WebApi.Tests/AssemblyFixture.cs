@@ -1,0 +1,1 @@
+[assembly: TestFramework("WebApi.Tests.AssemblyFixtureFramework", "WebApi.Tests")]
