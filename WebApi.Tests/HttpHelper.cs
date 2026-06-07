@@ -18,5 +18,5 @@ public static class HttpHelper
             await response.Content.ReadAsStreamAsync(), JsonOptions);
 }
 
-public record BookBody(string Column, string TypeOfCSharp, string Nullable);
-public record BookModel(int Id, string Column, string TypeOfCSharp, string Nullable) : BookBody(Column, TypeOfCSharp, Nullable);
+public record BookBody(string Name, string Author, DateOnly ReleaseDate);
+public record BookModel(int Id, string Name, string Author, DateOnly ReleaseDate) : BookBody(Name, Author, ReleaseDate);

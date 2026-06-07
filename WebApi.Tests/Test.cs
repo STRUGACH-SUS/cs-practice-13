@@ -10,7 +10,7 @@ public class Test(Fixture fixture) : IClassFixture<Fixture>
     public async Task CreateBook_ThenGetById_ReturnsSameBook()
     {
         // Arrange
-        var newBook = new BookBody("Text", "Text", "Text");
+        var newBook = new BookBody("Text", "Text", DateOnly.FromDateTime(DateTime.Now));
 
         // Act & Assert - Create
         var createResponse = await _client.PostAsync("/books", newBook.ToJsonContent());
@@ -18,9 +18,9 @@ public class Test(Fixture fixture) : IClassFixture<Fixture>
         
         Assert.Equal(HttpStatusCode.OK, createResponse.StatusCode);
         Assert.NotNull(createdBook);
-        Assert.Equal(newBook.Column, createdBook.Column);
-        Assert.Equal(newBook.TypeOfCSharp, createdBook.TypeOfCSharp);
-        Assert.Equal(newBook.Nullable, createdBook.Nullable);
+        Assert.Equal(newBook.Name, createdBook.Name);
+        Assert.Equal(newBook.Author, createdBook.Author);
+        Assert.Equal(newBook.ReleaseDate, createdBook.ReleaseDate);
 
         // Act & Assert - Get by Id
         var getResponse = await _client.GetAsync($"/books/{createdBook.Id}");
@@ -28,15 +28,15 @@ public class Test(Fixture fixture) : IClassFixture<Fixture>
         
         Assert.Equal(HttpStatusCode.OK, getResponse.StatusCode);
         Assert.Equal(createdBook.Id, fetchedBook!.Id);
-        Assert.Equal(createdBook.Column, fetchedBook.Column);
+        Assert.Equal(createdBook.Name, fetchedBook.Name);
     }
     
     [Fact]
     public async Task GetAllBooks_ReturnsList()
     {
         // Arrange
-        var book1 = new BookBody("1", "1", "1");
-        var book2 = new BookBody("2", "2", "2");
+        var book1 = new BookBody("1", "1", DateOnly.FromDateTime(DateTime.Now));
+        var book2 = new BookBody("2", "2", DateOnly.FromDateTime(DateTime.Now));
         
         await _client.PostAsync("/books", book1.ToJsonContent());
         await _client.PostAsync("/books", book2.ToJsonContent());
@@ -49,16 +49,16 @@ public class Test(Fixture fixture) : IClassFixture<Fixture>
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.NotNull(books);
         Assert.Equal(2, books.Count);
-        Assert.Contains(books, b => b.Column == "1");
-        Assert.Contains(books, b => b.Column == "2");
+        Assert.Contains(books, b => b.Name == "1");
+        Assert.Contains(books, b => b.Name == "2");
     }
     
     [Fact]
     public async Task SearchBooks_ByColumn_ReturnsFilteredResult()
     {
         // Arrange
-        await _client.PostAsync("/books", new BookBody("3", "3", "3").ToJsonContent());
-        await _client.PostAsync("/books", new BookBody("4", "4", "4").ToJsonContent());
+        await _client.PostAsync("/books", new BookBody("3", "3", DateOnly.FromDateTime(DateTime.Now)).ToJsonContent());
+        await _client.PostAsync("/books", new BookBody("4", "4", DateOnly.FromDateTime(DateTime.Now)).ToJsonContent());
 
         // Act
         var response = await _client.GetAsync("/books?search=3");
@@ -67,35 +67,35 @@ public class Test(Fixture fixture) : IClassFixture<Fixture>
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         Assert.Single(books!);
-        Assert.Contains("3", books[0].Column);
+        Assert.Contains("3", books[0].Name);
     }
     
     [Fact]
     public async Task UpdateBook_ChangesColumnValue()
     {
         // Arrange
-        var createResponse = await _client.PostAsync("/books", new BookBody("5", "5", "5").ToJsonContent());
+        var createResponse = await _client.PostAsync("/books", new BookBody("5", "5", DateOnly.FromDateTime(DateTime.Now)).ToJsonContent());
         var book = await createResponse.ReadFromJsonAsync<BookModel>();
         
         // Act
-        var updatedBody = new BookBody("6", "8", "12");
+        var updatedBody = new BookBody("6", "8", DateOnly.FromDateTime(DateTime.Now));
         var updateResponse = await _client.PutAsync($"/books/{book!.Id}", updatedBody.ToJsonContent());
         var updatedBook = await updateResponse.ReadFromJsonAsync<BookModel>();
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, updateResponse.StatusCode);
-        Assert.Equal("6", updatedBook!.Column);
+        Assert.Equal("6", updatedBook!.Name);
         
         var getResponse = await _client.GetAsync($"/books/{book.Id}");
         var fetchedBook = await getResponse.ReadFromJsonAsync<BookModel>();
-        Assert.Equal("6", fetchedBook!.Column);
+        Assert.Equal("6", fetchedBook!.Name);
     }
     
     [Fact]
     public async Task DeleteBook_RemovesFromDatabase()
     {
         // Arrange
-        var createResponse = await _client.PostAsync("/books", new BookBody("11", "11", "11").ToJsonContent());
+        var createResponse = await _client.PostAsync("/books", new BookBody("11", "11", DateOnly.FromDateTime(DateTime.Now)).ToJsonContent());
         var book = await createResponse.ReadFromJsonAsync<BookModel>();
 
         // Act
@@ -120,7 +120,7 @@ public class Test(Fixture fixture) : IClassFixture<Fixture>
     public async Task UpdateNonExistentBook_ReturnsNotFound()
     {
         var response = await _client.PutAsync("/books/99999", 
-            new BookBody("52", "67", "69").ToJsonContent());
+            new BookBody("52", "67", DateOnly.FromDateTime(DateTime.Now)).ToJsonContent());
         
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
