@@ -14,9 +14,9 @@ public class CRUD
         {
             var book = new Book
             {
-                Column = body.Column,
-                TypeOfCSharp = body.TypeOfCSharp, 
-                Nullable = body.Nullable
+                Name = body.Name,
+                Author = body.Author, 
+                ReleaseDate = DateOnly.FromDateTime(DateTime.Now)
             };
             dataContext.Books.Add(book);
     
@@ -25,9 +25,9 @@ public class CRUD
             return new BookModel
             {
                 Id = book.Id,
-                Column = book.Column,
-                TypeOfCSharp = book.TypeOfCSharp,
-                Nullable = book.Nullable
+                Name = book.Name,
+                Author = book.Author,
+                ReleaseDate = book.ReleaseDate
             };
         });
         await Task.CompletedTask;
@@ -49,9 +49,9 @@ public class CRUD
             return TypedResults.Ok(new BookModel
             {
                 Id = book.Id,
-                Column = book.Column,
-                TypeOfCSharp = book.TypeOfCSharp,
-                Nullable = book.Nullable
+                Name = book.Name,
+                Author = book.Author,
+                ReleaseDate = book.ReleaseDate
             });
         });
         await Task.CompletedTask;
@@ -68,7 +68,7 @@ public class CRUD
             if (string.IsNullOrEmpty(search) is false)
             {
                 query = query.Where(x => EF.Functions.Like(
-                    x.Column.ToLower(), 
+                    x.Name.ToLower(), 
                     $"%{search.ToLower()}%"));
             }
 
@@ -76,9 +76,9 @@ public class CRUD
                 .Select(x => new BookModel
                 {
                     Id = x.Id,
-                    Column = x.Column,
-                    TypeOfCSharp = x.TypeOfCSharp,
-                    Nullable = x.Nullable
+                    Name = x.Name,
+                    Author = x.Author,
+                    ReleaseDate = x.ReleaseDate
                 })
                 .OrderByDescending(x => x.Id)
                 .ToListAsync(ct);
@@ -100,15 +100,15 @@ public class CRUD
                 return TypedResults.NotFound();
             }
     
-            book.Column = body.Column;
+            book.Name = body.Name;
             await dataContext.SaveChangesAsync(ct);
 
             return TypedResults.Ok(new BookModel
             {
                 Id = book.Id,
-                Column = book.Column,
-                TypeOfCSharp = book.TypeOfCSharp,
-                Nullable = book.Nullable
+                Name = book.Name,
+                Author = book.Author,
+                ReleaseDate = book.ReleaseDate
             });
         });
         await Task.CompletedTask;

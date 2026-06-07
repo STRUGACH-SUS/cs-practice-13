@@ -35,9 +35,9 @@ app.MapPost("/books", async (
 {
     var book = new Book
     {
-        Column = body.Column,
-        TypeOfCSharp = body.TypeOfCSharp, 
-        Nullable = body.Nullable
+        Name = body.Name,
+        Author = body.Author, 
+        ReleaseDate = DateOnly.FromDateTime(DateTime.Now)
     };
     dataContext.Books.Add(book);
     
@@ -46,9 +46,9 @@ app.MapPost("/books", async (
     return new BookModel
     {
         Id = book.Id,
-        Column = book.Column,
-        TypeOfCSharp = book.TypeOfCSharp,
-        Nullable = book.Nullable
+        Name = book.Name,
+        Author = book.Author,
+        ReleaseDate = book.ReleaseDate
     };
 });
 
@@ -66,9 +66,9 @@ app.MapGet("/books/{id:int}", async Task<Results<NotFound, Ok<BookModel>>> (
     return TypedResults.Ok(new BookModel
     {
         Id = book.Id,
-        Column = book.Column,
-        TypeOfCSharp = book.TypeOfCSharp,
-        Nullable = book.Nullable
+        Name = book.Name,
+        Author = book.Author,
+        ReleaseDate = book.ReleaseDate
     });
 });
 
@@ -81,7 +81,7 @@ app.MapGet("/books", async (
     if (string.IsNullOrEmpty(search) is false)
     {
         query = query.Where(x => EF.Functions.Like(
-            x.Column.ToLower(), 
+            x.Name.ToLower(), 
             $"%{search.ToLower()}%"));
     }
 
@@ -89,9 +89,9 @@ app.MapGet("/books", async (
         .Select(x => new BookModel
         {
             Id = x.Id,
-            Column = x.Column,
-            TypeOfCSharp = x.TypeOfCSharp,
-            Nullable = x.Nullable
+            Name = x.Name,
+            Author = x.Author,
+            ReleaseDate = x.ReleaseDate
         })
         .OrderByDescending(x => x.Id)
         .ToListAsync(ct);
@@ -109,15 +109,15 @@ app.MapPut("/books/{id:int}", async Task<Results<NotFound, Ok<BookModel>>> (
         return TypedResults.NotFound();
     }
 
-    book.Column = body.Column;
+    book.Name = body.Name;
     await dataContext.SaveChangesAsync(ct);
 
     return TypedResults.Ok(new BookModel
     {
         Id = book.Id,
-        Column = book.Column,
-        TypeOfCSharp = book.TypeOfCSharp,
-        Nullable = book.Nullable
+        Name = book.Name,
+        Author = book.Author,
+        ReleaseDate = book.ReleaseDate
     });
 });
 
@@ -141,9 +141,9 @@ app.MapDelete("/books/{id:int}", async Task<Results<NotFound, NoContent>> (
 app.Run();
 public record BookBody
 {
-    public required string Column {get;set;}
-    public required string TypeOfCSharp {get;set;}
-    public required string Nullable {get;set;}
+    public required string Name {get;set;}
+    public required string Author {get;set;}
+    public required DateOnly ReleaseDate {get;set;}
 }
 
 public record BookModel : BookBody

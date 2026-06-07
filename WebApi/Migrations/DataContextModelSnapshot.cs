@@ -22,15 +22,15 @@ namespace WebApi.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Column")
+                    b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Nullable")
+                    b.Property<string>("ReleaseDate")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("TypeOfCSharp")
+                    b.Property<string>("Author")
                         .IsRequired()
                         .HasColumnType("TEXT");
 
